@@ -1,41 +1,13 @@
 use console::Term;
-use console::Key;
 
 use crate::ecs::{Board, Score, Position};
 
-const SCREEN_X: usize = 75;
-const SCREEN_MID_X: usize = SCREEN_X / 2;
-const SCREEN_Y: usize = 25;
-const SCREEN_MID_Y: usize = SCREEN_Y / 2;
+pub const SCREEN_X: usize = 75;
+pub const SCREEN_MID_X: usize = SCREEN_X / 2;
+pub const SCREEN_Y: usize = 25;
+pub const SCREEN_MID_Y: usize = SCREEN_Y / 2;
 
 pub type Screen = [[char; SCREEN_X]; SCREEN_Y];
-
-pub fn init_board(board: &mut Board) {
-
-	// Player 1
-	board.new_entity(
-		Some(Score(0)),
-		Some(Position(
-			SCREEN_MID_Y,
-			1,
-		)));
-
-	// Player 2
-	board.new_entity(
-		Some(Score(0)),
-		Some(Position(
-			SCREEN_MID_Y,
-			SCREEN_X - 2,
-		)));
-
-	// Ball
-	board.new_entity(
-		None,
-		Some(Position(
-			SCREEN_MID_Y,
-			SCREEN_MID_X,
-		)));
-}
 
 pub fn init_screen(board: &Board) -> Screen {
 
@@ -87,42 +59,6 @@ pub fn init_screen(board: &Board) -> Screen {
 }
 
 
-pub fn get_user_input(stdout: &Term) {
-
-	if let Ok(key) = stdout.read_key() {
-
-		match key {
-
-			Key::ArrowLeft => println!("Left"),
-			Key::ArrowRight => println!("Right"),
-			Key::ArrowUp => println!("Up"),
-			Key::ArrowDown => println!("Down"),
-
-			Key::Char(c) => {
-				match c {
-					'q' => todo!("quit"),
-					_ => println!("{}", c),
-				}
-			}
-
-			Key::Enter => println!("Enter"),
-			Key::Escape => println!("Escape"),
-			Key::Backspace => println!("Backspace"),
-			Key::Home => println!("Home"),
-			Key::End => println!("End"),
-			Key::Tab => println!("Tab"),
-			Key::BackTab => println!("BackTab"),
-			Key::Alt => println!("Alt"),
-			Key::Del => println!("Del"),
-			Key::Shift => println!("Shift"),
-			Key::Insert => println!("Insert"),
-			Key::PageUp => println!("PageUp"),
-			Key::PageDown => println!("PageDown"),
-
-			_ => println!("Couldn't match key"),
-		}
-	}
-}
 
 pub fn draw_screen(screen: Screen, stdout: &Term) {
 
