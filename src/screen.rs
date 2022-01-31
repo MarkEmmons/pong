@@ -76,16 +76,11 @@ pub fn draw_screen(screen: Screen, stdout: &Term) {
 
 pub fn update_screen(screen: &mut Screen, board: &Board) {
 
+	// Blank columns with paddles
 	for r in 1..(screen.len() - 1) {
 
-		for c in 1..(screen[r].len() - 1) {
-
-			screen[r][c] = if c == SCREEN_MID_X {
-				'|'
-			} else {
-				' '
-			};
-		}
+		screen[r][1] = ' ';
+		screen[r][SCREEN_X - 2] = ' ';
 	}
 
 
