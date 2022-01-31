@@ -1,39 +1,59 @@
+use log::info;
 use console::{Key, Term};
 
-pub fn get_user_input(stdout: &Term) {
+use crate::Board;
+
+const UP: isize = -1;
+const DOWN: isize = 1;
+
+pub fn get_user_input(stdout: &Term, board: &mut Board) {
 
 	if let Ok(key) = stdout.read_key() {
 
 		match key {
 
-			Key::ArrowLeft => println!("Left"),
-			Key::ArrowRight => println!("Right"),
-			Key::ArrowUp => println!("Up"),
-			Key::ArrowDown => println!("Down"),
+			// Supported Keys - Up and Down
+			Key::ArrowUp => {
+				board.move_player(1, UP);
+			}
+			Key::ArrowDown => {
+				board.move_player(1, DOWN);
+			}
 
+			// Character Keys
 			Key::Char(c) => {
 				match c {
+
+					// Quit when the user hits 'q'
 					'q' => todo!("quit"),
-					_ => println!("{}", c),
+
+					'w' => board.move_player(0, UP),
+
+					's' => board.move_player(0, DOWN),
+
+					// All other character keys unused
+					_ => info!("Caught unused key: {}", c),
 				}
 			}
 
-			Key::Enter => println!("Enter"),
-			Key::Escape => println!("Escape"),
-			Key::Backspace => println!("Backspace"),
-			Key::Home => println!("Home"),
-			Key::End => println!("End"),
-			Key::Tab => println!("Tab"),
-			Key::BackTab => println!("BackTab"),
-			Key::Alt => println!("Alt"),
-			Key::Del => println!("Del"),
-			Key::Shift => println!("Shift"),
-			Key::Insert => println!("Insert"),
-			Key::PageUp => println!("PageUp"),
-			Key::PageDown => println!("PageDown"),
+			// Special Keys not used
+			Key::ArrowLeft => info!("Caught unused key: Left"),
+			Key::ArrowRight => info!("Caught unused key: Right"),
+			Key::Enter => info!("Caught unused key: Enter"),
+			Key::Escape => info!("Caught unused key: Escape"),
+			Key::Backspace => info!("Caught unused key: Backspace"),
+			Key::Home => info!("Caught unused key: Home"),
+			Key::End => info!("Caught unused key: End"),
+			Key::Tab => info!("Caught unused key: Tab"),
+			Key::BackTab => info!("Caught unused key: BackTab"),
+			Key::Alt => info!("Caught unused key: Alt"),
+			Key::Del => info!("Caught unused key: Del"),
+			Key::Shift => info!("Caught unused key: Shift"),
+			Key::Insert => info!("Caught unused key: Insert"),
+			Key::PageUp => info!("Caught unused key: PageUp"),
+			Key::PageDown => info!("Caught unused key: PageDown"),
 
-			_ => println!("Couldn't match key"),
+			_ => info!("Caught unused key: Couldn't match key"),
 		}
 	}
 }
-
