@@ -14,62 +14,74 @@ const INVALID_POSITION: Position = Position {
 
 pub struct Score(pub u8);
 
+pub enum Entity {
+	Player(Option<Position>, Option<Score>),
+	Ball(Option<Position>),
+}
+
 pub struct Board {
-	pub score_components: Vec<Option<Score>>,
-	pub position_components: Vec<Option<Position>>,
+	pub entity_components: Vec<Entity>,
 }
 
 impl Board {
 
 	pub fn new() -> Self {
 		Self {
-			score_components: Vec::new(),
-			position_components: Vec::new(),
+			entity_components: Vec::new(),
 		}
 	}
 
-	pub fn new_entity(&mut self, score: Option<Score>, position: Option<Position>) {
-		self.score_components.push(score);
-		self.position_components.push(position);
+	pub fn new_entity(&mut self, position: Option<Position>, score: Option<Score>) {
+		match score {
+			None => self.entity_components.push(Entity::Ball(position)),
+			Some(ref _s) => self.entity_components.push(Entity::Player(position, score)),
+		}
 	}
 
 	pub fn init_board(board: &mut Board) {
 
 		// Player 1
 		board.new_entity(
-			Some(Score(0)),
 			Some(Position {
 				pos_x: 1,
 				pos_y: SCREEN_MID_Y,
-			}));
+			}),
+			Some(Score(0))
+		);
 
 		// Player 2
 		board.new_entity(
-			Some(Score(0)),
 			Some(Position {
 				pos_x: SCREEN_X - 2,
 				pos_y: SCREEN_MID_Y,
-			}));
+			}),
+			Some(Score(0))
+		);
 
 		// Ball
 		board.new_entity(
-			None,
 			Some(Position {
 				pos_x: SCREEN_MID_X,
 				pos_y: SCREEN_MID_Y,
-			}));
+			}),
+			None
+		);
 	}
-
 
 	pub fn move_player(&mut self, player: usize, direction: isize) {
 
 		info!("Moving player {}: {}", player, direction);
 
 		// Get current y position, will return 0 if position is None
-		let cur_pos_y = self.position_components[player]
-			.as_ref()
-			.unwrap_or(&INVALID_POSITION)
-			.pos_y;
+		let cur_pos_y = match &self.entity_components[player] {
+			Entity::Player(player, _score) => {
+				player
+				.as_ref()
+				.unwrap_or(&INVALID_POSITION)
+				.pos_y
+			}
+			_ => 0
+		};
 
 		// Invalid position -> unwrap returned NONE
 		if cur_pos_y == 0 {
@@ -90,10 +102,15 @@ impl Board {
 		}
 
 		// Unwrap should be Some since we validated when copying pos_x
-		self.position_components[player]
-			.as_mut()
-			.unwrap()
-			.pos_y = new_pos;
+		match &mut self.entity_components[player] {
+			Entity::Player(player, _score) => {
+				player
+				.as_mut()
+				.unwrap()
+				.pos_y = new_pos;
+			}
+			_ => (),
+		}
 
 		info!("Player position moved to {}", new_pos);
 	}
