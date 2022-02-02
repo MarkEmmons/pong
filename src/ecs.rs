@@ -3,7 +3,7 @@ use std::cell::{RefCell, RefMut};
 
 use log::{info, warn};
 
-use crate::screen::{SCREEN_X, SCREEN_Y}; //, SCREEN_MID_X, SCREEN_MID_Y};
+use crate::screen::{SCREEN_X, SCREEN_Y};//, SCREEN_MID_X, SCREEN_MID_Y};
 
 pub struct Position {
 	pub pos_x: usize,
@@ -108,6 +108,22 @@ impl Board {
 			);
 	}
 
+	pub fn borrow_component_vec_ref<ComponentType: 'static>(
+		&self
+	) -> Option<RefMut<Vec<Option<ComponentType>>>> {
+
+		for component_vec in self.component_vecs.iter() {
+			if let Some(component_vec) = component_vec
+				.as_any()
+				.downcast_ref::<RefCell<Vec<Option<ComponentType>>>>()
+			{
+				// Why does this work with return???
+				return Some(component_vec.borrow_mut());
+			}
+		}
+	None
+	}
+
 	pub fn borrow_component_vec_mut<ComponentType: 'static>(
 		&self
 	) -> Option<RefMut<Vec<Option<ComponentType>>>> {
@@ -124,21 +140,21 @@ impl Board {
 	None
 	}
 
-	pub fn move_player(&mut self, player: usize, direction: isize) {
+	pub fn move_entity(&mut self, entity: usize, direction: isize) {
 
-		info!("Moving player {}: {}", player, direction);
+		info!("Moving entity {}: {}", entity, direction);
 
 		// Get current y position, will return 0 if position is None
 		let cur_pos_y = self
 			.borrow_component_vec_mut::<Position>()
-			.unwrap()[player]
+			.unwrap()[entity]
 			.as_ref()
 			.unwrap_or(&INVALID_POSITION)
 			.pos_y;
 
 		// Invalid position -> unwrap returned NONE
 		if cur_pos_y == 0 {
-			info!("Couldn't find valid position for player {}", player);
+			info!("Couldn't find valid position for entity {}", entity);
 			return;
 		}
 
@@ -157,7 +173,7 @@ impl Board {
 		// Assign the new position value
 		self
 			.borrow_component_vec_mut::<Position>()
-			.unwrap()[player]
+			.unwrap()[entity]
 			.as_mut()
 			.unwrap()
 			.pos_y = new_pos;
@@ -165,21 +181,24 @@ impl Board {
 		info!("Player position moved to {}", new_pos);
 	}
 
-	pub fn move_balls(&mut self) {
+	pub fn move_autos(&mut self) {
 
-		info!("Moving balls");
+		info!("Moving autos");
 
-		// Get the ball entities
+		// Get the entities with trajectories
 		let mut positions = self
 			.borrow_component_vec_mut::<Position>().unwrap();
-
 		let mut trajectories = self
 			.borrow_component_vec_mut::<Trajectory>().unwrap();
 
-		let zip = positions.iter_mut().zip(trajectories.iter_mut());
-		let iter = zip.filter_map(| (position, trajectory) | Some((position.as_mut()?, trajectory.as_mut()?)));
+		let autos = positions
+			.iter_mut()
+			.zip(trajectories.iter_mut())
+			.filter_map(| (position, trajectory) |
+				Some((position.as_mut()?, trajectory.as_mut()?))
+			);
 
-		for(position, trajectory) in iter {
+		for(position, trajectory) in autos {
 
 			// Get current position
 			let cur_pos_x = position.pos_x;
@@ -191,7 +210,7 @@ impl Board {
 
 			// Invalid position
 			if cur_pos_x == 0 || cur_pos_y == 0 {
-				warn!("Couldn't find valid position for ball");
+				warn!("Couldn't find valid position for auto");
 				return;
 			}
 
@@ -208,71 +227,51 @@ impl Board {
 					Some(new_pos_y) => new_pos_y,
 				};
 
-			// Calculate scores / paddle collisions
 			match new_pos_x {
 
 				// Hit the left paddle or score
 				PLAYER_1_ROW => {
-
-					// Check for paddle collision
-					//let mut paddle_positions: Vec<(usize, usize)> = Vec::new();
-					//for paddle_position in paddle_positions {
-
-					//	let px = paddle_position.0;
-					//	let py = paddle_position.1;
-
-					//	if px != PLAYER_1_ROW {
-					//		continue;
-					//	}
-
-					//	// Paddle-Top
-					//	if new_pos_y == py + 1 { trajectory.trj_x = 1; trajectory.trj_y -= 1; }
-					//	// Paddle-Middle
-					//	else if new_pos_y == py { trajectory.trj_x = 1; trajectory.trj_y -= 1; }
-					//	// Paddle-Bottom
-					//	else if new_pos_y == py - 1 { trajectory.trj_x = 1; trajectory.trj_y -= 1; }
-					//	// Score!
-					//	else {
-					//		position.pos_x = SCREEN_MID_X;
-					//		position.pos_y = SCREEN_MID_Y;
-					//	}
-
-					//}
-
-					// TODO
 					trajectory.trj_x = 1;
-					info!("Ball x trajectory updated to 1");
+					info!("Auto x trajectory updated to 1");
 				}
 
 				// Hit the right paddle or score
 				PLAYER_2_ROW => {
 					trajectory.trj_x = -1;
-					info!("Ball x trajectory updated to -1");
+					info!("Auto x trajectory updated to -1");
 				}
 
 				// Update position
 				_ => {
 					position.pos_x = new_pos_x;
-					info!("Ball x position moved to {}", new_pos_x);
+					info!("Auto x position moved to {}", new_pos_x);
 				}
 			}
 
 			if new_pos_y <= 0 {
 				trajectory.trj_y = 1;
-				info!("Ball y trajectory updated to 1");
+				info!("Auto y trajectory updated to 1");
 			} else if new_pos_y >= SCREEN_Y-1 {
 				trajectory.trj_y = -1;
-				info!("Ball y trajectory updated to -1");
+				info!("Auto y trajectory updated to -1");
 			} else {
 				position.pos_y = new_pos_y;
-				info!("Ball y position moved to {}", new_pos_y);
+				info!("Auto y position moved to {}", new_pos_y);
 			}
+		}
+	}
+
+	#[allow(dead_code)]
+	pub fn detect_collisions(&mut self) {
+
+		for e in 0..self.entities_count {
+
+			self.component_vecs.get(e);
 		}
 	}
 }
 
 // Add an isize to a usize and return a wrapped usize
-#[allow(dead_code)]
 fn update_position(pos: usize, dir: isize) -> Option<usize> {
 
 	if dir.is_negative() {

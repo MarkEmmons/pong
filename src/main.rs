@@ -58,7 +58,7 @@ fn main() {
 
 		screen::draw_screen(screen, &stdout);
 
-		input::get_user_input(&stdout, &mut board);
+		input::get_user_input(&stdout, &mut board, player1, player2);
 
 		screen::update_screen(&mut screen, &mut board);
 	}

@@ -6,8 +6,7 @@ use crate::Board;
 const UP: isize = -1;
 const DOWN: isize = 1;
 
-#[allow(unused_variables)]
-pub fn get_user_input(stdout: &Term, board: &mut Board) {
+pub fn get_user_input(stdout: &Term, board: &mut Board, player1: usize, player2: usize) {
 
 	if let Ok(key) = stdout.read_key() {
 
@@ -15,10 +14,10 @@ pub fn get_user_input(stdout: &Term, board: &mut Board) {
 
 			// Supported Keys - Up and Down
 			Key::ArrowUp => {
-				board.move_player(1, UP);
+				board.move_entity(player2, UP);
 			}
 			Key::ArrowDown => {
-				board.move_player(1, DOWN);
+				board.move_entity(player2, DOWN);
 			}
 
 			// Character Keys
@@ -28,9 +27,9 @@ pub fn get_user_input(stdout: &Term, board: &mut Board) {
 					// Quit when the user hits 'q'
 					'q' => todo!("quit"),
 
-					'w' => board.move_player(0, UP),
+					'w' => board.move_entity(player1, UP),
 
-					's' => board.move_player(0, DOWN),
+					's' => board.move_entity(player1, DOWN),
 
 					// All other character keys unused
 					_ => info!("Caught unused key: {}", c),
@@ -58,5 +57,5 @@ pub fn get_user_input(stdout: &Term, board: &mut Board) {
 		}
 	}
 
-	board.move_balls();
+	board.move_autos();
 }
