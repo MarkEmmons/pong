@@ -1,6 +1,6 @@
 use console::Term;
 
-use crate::ecs::{Board, Entity};
+use crate::ecs::{Board, Position, Score, Trajectory};
 
 pub const SCREEN_X: usize = 75;
 pub const SCREEN_Y: usize = 25;
@@ -21,11 +21,13 @@ pub fn init_screen(board: &Board) -> Screen {
 
 	update_paddles(&mut screen, board);
 
+	update_balls(&mut screen, board);
+
 	screen
 }
 
 // Update the array values with new positions
-pub fn update_screen(screen: &mut Screen, board: &Board) {
+pub fn update_screen(screen: &mut Screen, board: &mut Board) {
 
 	clear_board(screen);
 
@@ -69,15 +71,16 @@ fn clear_board(screen: &mut Screen) {
 // Update the position of each paddle on the screen array
 fn update_paddles(screen: &mut Screen, board: &Board) {
 
-	let player_paddles = board
-		.entity_components
-		.iter()
-		.filter_map(| entity | { match entity {
-			Entity::Player(p, s) => Some((p.as_ref()?, s.as_ref()?)),
-			_ => None,
-		}});
+	let mut positions = board
+		.borrow_component_vec_mut::<Position>().unwrap();
 
-	for(position, score) in player_paddles {
+	let mut scores = board
+		.borrow_component_vec_mut::<Score>().unwrap();
+
+	let zip = positions.iter_mut().zip(scores.iter_mut());
+	let iter = zip.filter_map(| (position, score) | Some((position.as_mut()?, score.as_mut()?)));
+
+	for(position, score) in iter {
 
 		// Draw Paddle
 		screen[position.pos_y - 1][position.pos_x] = '|';
@@ -101,15 +104,16 @@ fn update_paddles(screen: &mut Screen, board: &Board) {
 // Update the position of each ball on the screen array
 fn update_balls(screen: &mut Screen, board: &Board) {
 
-	let balls = board
-		.entity_components
-		.iter()
-		.filter_map(| entity | { match entity {
-			Entity::Ball(p) => Some(p.as_ref()?),
-			_ => None,
-		}});
+	let mut positions = board
+		.borrow_component_vec_mut::<Position>().unwrap();
 
-	for position in balls {
+	let mut trajectories = board
+		.borrow_component_vec_mut::<Trajectory>().unwrap();
+
+	let zip = positions.iter_mut().zip(trajectories.iter_mut());
+	let iter = zip.filter_map(| (position, trajectory) | Some((position.as_mut()?, trajectory.as_mut()?)));
+
+	for(position, _trajectory) in iter {
 
 		// Draw Ball
 		screen[position.pos_y][position.pos_x] = 'O';

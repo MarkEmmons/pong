@@ -6,6 +6,7 @@ use crate::Board;
 const UP: isize = -1;
 const DOWN: isize = 1;
 
+#[allow(unused_variables)]
 pub fn get_user_input(stdout: &Term, board: &mut Board) {
 
 	if let Ok(key) = stdout.read_key() {
@@ -56,4 +57,6 @@ pub fn get_user_input(stdout: &Term, board: &mut Board) {
 			_ => info!("Caught unused key: Couldn't match key"),
 		}
 	}
+
+	board.move_balls();
 }
