@@ -180,10 +180,7 @@ impl Board {
 			return;
 		}
 
-		let new_pos = match update_position(cur_pos_y, direction) {
-			None => cur_pos_y,
-			Some(new_pos_y) => new_pos_y,
-		};
+		let new_pos = update_position(cur_pos_y, direction);
 
 		// New position is out of bounds, don't update
 		if new_pos <= 1
@@ -275,17 +272,8 @@ impl Board {
 			}
 
 			// Calculate new position
-			let new_pos_x =
-				match update_position(cur_pos_x, cur_trj_x) {
-					None => cur_pos_x,
-					Some(new_pos_x) => new_pos_x,
-				};
-
-			let new_pos_y =
-				match update_position(cur_pos_y, cur_trj_y) {
-					None => cur_pos_y,
-					Some(new_pos_y) => new_pos_y,
-				};
+			let new_pos_x = update_position(cur_pos_x, cur_trj_x);
+			let new_pos_y = update_position(cur_pos_y, cur_trj_y);
 
 			match new_pos_x {
 
@@ -364,13 +352,7 @@ fn detect_paddle_collisions(position: &mut Position,
 		// Top paddle hit
 		if position.pos_y == py - 1 {
 
-			position.pos_x = match update_position(
-				position.pos_x,
-				direction
-			) {
-				Some(new_pos_x) => new_pos_x,
-				None => position.pos_x,
-			};
+			position.pos_x = update_position(position.pos_x, direction);
 			if position.pos_y > 2 {
 				position.pos_y -= 1;
 			}
@@ -387,13 +369,7 @@ fn detect_paddle_collisions(position: &mut Position,
 		// Middle paddle hit
 		} else if position.pos_y == py {
 
-			position.pos_x = match update_position(
-				position.pos_x,
-				direction
-			) {
-				Some(new_pos_x) => new_pos_x,
-				None => position.pos_x,
-			};
+			position.pos_x = update_position(position.pos_x, direction);
 
 			trajectory.trj_x = direction;
 			trajectory.trj_y = 0;
@@ -407,13 +383,7 @@ fn detect_paddle_collisions(position: &mut Position,
 		// Bottom paddle hit
 		} else if position.pos_y == py + 1 {
 
-			position.pos_x = match update_position(
-				position.pos_x,
-				direction
-			) {
-				Some(new_pos_x) => new_pos_x,
-				None => position.pos_x,
-			};
+			position.pos_x = update_position(position.pos_x, direction);
 			if position.pos_y < SCREEN_Y-3 {
 				position.pos_y += 1;
 			}
@@ -444,11 +414,16 @@ fn detect_paddle_collisions(position: &mut Position,
 }
 
 // Add an isize to a usize and return a wrapped usize
-fn update_position(pos: usize, dir: isize) -> Option<usize> {
+fn update_position(pos: usize, dir: isize) -> usize {
 
-	if dir.is_negative() {
+	let new_pos = if dir.is_negative() {
 		pos.checked_sub(dir.wrapping_abs() as usize)
 	} else {
 		pos.checked_add(dir as usize)
+	};
+
+	match new_pos {
+		Some(result) => result,
+		None => pos,
 	}
 }
