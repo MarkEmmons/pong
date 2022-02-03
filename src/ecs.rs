@@ -28,8 +28,8 @@ const INVALID_POSITION: Position = Position {
 const PLAYER_1_ROW: usize = 1;
 const PLAYER_2_ROW: usize = SCREEN_X - 2;
 
-const PLAYER_1_X_DIRECTION: isize = -1;
-const PLAYER_2_X_DIRECTION: isize = 1;
+const PLAYER_1_X_DIRECTION: isize = 1;
+const PLAYER_2_X_DIRECTION: isize = -1;
 
 // Component
 pub trait ComponentVec {
