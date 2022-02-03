@@ -47,7 +47,7 @@ fn main() {
 	});
 	board.add_component_to_entity(ball, Trajectory {
 		trj_x: 1,
-		trj_y: 1,
+		trj_y: 0,
 	});
 
 	// Initialize Screen

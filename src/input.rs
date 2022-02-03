@@ -57,5 +57,8 @@ pub fn get_user_input(stdout: &Term, board: &mut Board, player1: usize, player2:
 		}
 	}
 
-	board.move_autos();
+	match board.move_autos(player1, player2) {
+		Some(player) => board.update_score(player),
+		_ => (),
+	}
 }
