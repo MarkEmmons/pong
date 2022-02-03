@@ -264,9 +264,12 @@ impl Board {
 			let cur_trj_x = trajectory.trj_x;
 			let cur_trj_y = trajectory.trj_y;
 
-			// Invalid position
-			// TODO: Better bounds checking
-			if cur_pos_x == 0 || cur_pos_y == 0 {
+			// Invalid positions
+			if cur_pos_x == 0
+				|| cur_pos_y == 0
+				|| cur_pos_x > (SCREEN_X-2)
+				|| cur_pos_y > (SCREEN_Y-2)
+			{
 				warn!("Couldn't find valid position for auto");
 				return None;
 			}
