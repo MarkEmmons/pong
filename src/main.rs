@@ -3,6 +3,7 @@ mod constants;
 mod components;
 mod input;
 mod screen;
+mod systems;
 mod logger;
 
 use log::info;
