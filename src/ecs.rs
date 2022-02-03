@@ -118,32 +118,20 @@ impl Board {
 		&self
 	) -> Option<Ref<Vec<Option<ComponentType>>>> {
 
-		for component_vec in self.component_vecs.iter() {
-			if let Some(component_vec) = component_vec
-				.as_any()
-				.downcast_ref::<RefCell<Vec<Option<ComponentType>>>>()
-			{
-				// Why does this work with return???
-				return Some(component_vec.borrow());
-			}
+		match self.borrow_component_vec::<ComponentType>() {
+			Some(component_vec) => Some(component_vec.borrow()),
+			None => None,
 		}
-	None
 	}
 
 	pub fn borrow_component_vec_mut<ComponentType: 'static>(
 		&self
 	) -> Option<RefMut<Vec<Option<ComponentType>>>> {
 
-		for component_vec in self.component_vecs.iter() {
-			if let Some(component_vec) = component_vec
-				.as_any()
-				.downcast_ref::<RefCell<Vec<Option<ComponentType>>>>()
-			{
-				// Why does this work with return???
-				return Some(component_vec.borrow_mut());
-			}
+		match self.borrow_component_vec::<ComponentType>() {
+			Some(component_vec) => Some(component_vec.borrow_mut()),
+			None => None,
 		}
-	None
 	}
 
 	pub fn borrow_component_vec<ComponentType: 'static>(
