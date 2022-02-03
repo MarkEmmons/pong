@@ -200,22 +200,11 @@ impl Board {
 		info!("Player position moved to {}", new_pos);
 	}
 
-	//fn get_paddle_positions<ComponentType: 'static>(&self, r_positions: &Rc<&RefCell<Vec<Option<ComponentType>>>>) -> Vec<Position> {
-
-	//	pos_vec
-	//}
-
-	pub fn move_autos(&mut self, player1: usize, player2: usize) -> Option<usize> {
-
-		let r_positions = Rc::new(self
-			.borrow_component_vec::<Position>()
-			.unwrap()
-		);
+	fn get_paddle_positions(&self, p_positions: Rc<&RefCell<Vec<Option<Position>>>>) -> Vec<Position> {
 
 		let mut pos_vec: Vec<Position> = Vec::new();
 
-		{
-		let p_positions = Rc::clone(&r_positions).borrow();
+		let p_positions = p_positions.borrow();
 
 		let scores = self
 			.borrow_component_vec_ref::<Score>().unwrap();
@@ -234,11 +223,20 @@ impl Board {
 				pos_y: position.pos_y,
 			});
 		}
-		}
 
-		//let mut pos_vec: Vec<Position> = self.get_paddle_positions(&r_positions);
+		pos_vec
+	}
 
-		debug!("Here's a vector! {:?}", pos_vec);
+	pub fn move_autos(&mut self, player1: usize, player2: usize) -> Option<usize> {
+
+		let r_positions = Rc::new(self
+			.borrow_component_vec::<Position>()
+			.unwrap()
+		);
+
+		let p_positions = Rc::clone(&r_positions);
+		let pos_vec: Vec<Position> = self.get_paddle_positions(p_positions);
+
 		info!("Moving autos");
 
 		// Get the entities with trajectories
