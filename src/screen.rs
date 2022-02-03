@@ -1,12 +1,8 @@
 use console::Term;
 
-use crate::ecs::{Board, Position, Score, Trajectory};
-
-pub const SCREEN_X: usize = 75;
-pub const SCREEN_Y: usize = 25;
-
-pub const SCREEN_MID_X: usize = SCREEN_X / 2;
-pub const SCREEN_MID_Y: usize = SCREEN_Y / 2;
+use crate::components::{Position, Score, Trajectory};
+use crate::constants::{SCREEN_X, SCREEN_Y, SCREEN_MID_X};
+use crate::ecs::Board;
 
 pub type Screen = [[char; SCREEN_X]; SCREEN_Y];
 

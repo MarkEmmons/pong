@@ -1,4 +1,6 @@
 mod ecs;
+mod constants;
+mod components;
 mod input;
 mod screen;
 mod logger;
@@ -6,8 +8,9 @@ mod logger;
 use log::info;
 use console::Term;
 
-use crate::screen::{SCREEN_X, SCREEN_MID_X, SCREEN_MID_Y};
-use crate::ecs::{Board, Position, Trajectory, Score};
+use crate::constants::{SCREEN_X, SCREEN_MID_X, SCREEN_MID_Y};
+use crate::components::{Position, Trajectory, Score};
+use crate::ecs::Board;
 use crate::screen::Screen;
 
 fn main() {

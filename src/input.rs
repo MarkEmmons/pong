@@ -1,10 +1,8 @@
 use log::info;
 use console::{Key, Term};
 
+use crate::constants::{UP, DOWN};
 use crate::Board;
-
-const UP: isize = -1;
-const DOWN: isize = 1;
 
 pub fn get_user_input(terminal: &Term, board: &mut Board, player1: usize, player2: usize) {
 

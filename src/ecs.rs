@@ -5,31 +5,18 @@ use std::cell::{RefCell, Ref, RefMut};
 use log::debug;
 use log::{info, warn};
 
-use crate::screen::{SCREEN_X, SCREEN_Y, SCREEN_MID_X, SCREEN_MID_Y};
-
-#[derive(Debug)]
-pub struct Position {
-	pub pos_x: usize,
-	pub pos_y: usize,
-}
-
-pub struct Trajectory {
-	pub trj_x: isize,
-	pub trj_y: isize,
-}
-
-pub struct Score(pub u8);
-
-const INVALID_POSITION: Position = Position {
-	pos_x: 0,
-	pos_y: 0,
+use crate::constants::{
+	SCREEN_X
+	,SCREEN_Y
+	,SCREEN_MID_X
+	,SCREEN_MID_Y
+	,PLAYER_1_ROW
+	,PLAYER_2_ROW
+	,PLAYER_1_X_DIRECTION
+	,PLAYER_2_X_DIRECTION
 };
 
-const PLAYER_1_ROW: usize = 1;
-const PLAYER_2_ROW: usize = SCREEN_X - 2;
-
-const PLAYER_1_X_DIRECTION: isize = 1;
-const PLAYER_2_X_DIRECTION: isize = -1;
+use crate::components::{Position, Score, Trajectory};
 
 // Component
 pub trait ComponentVec {
@@ -159,7 +146,7 @@ impl Board {
 			.borrow_component_vec_mut::<Position>()
 			.unwrap()[entity]
 			.as_ref()
-			.unwrap_or(&INVALID_POSITION)
+			.unwrap_or_default()
 			.pos_y;
 
 		// Invalid position -> unwrap returned NONE
