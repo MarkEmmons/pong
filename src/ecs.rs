@@ -28,6 +28,9 @@ const INVALID_POSITION: Position = Position {
 const PLAYER_1_ROW: usize = 1;
 const PLAYER_2_ROW: usize = SCREEN_X - 2;
 
+const PLAYER_1_X_DIRECTION: isize = -1;
+const PLAYER_2_X_DIRECTION: isize = 1;
+
 // Component
 pub trait ComponentVec {
 	fn as_any(&self) -> &dyn any::Any;
@@ -229,22 +232,22 @@ impl Board {
 
 	pub fn move_autos(&mut self, player1: usize, player2: usize) -> Option<usize> {
 
-		let r_positions = Rc::new(self
+		info!("Moving autos");
+
+		let rc_positions = Rc::new(self
 			.borrow_component_vec::<Position>()
 			.unwrap()
 		);
 
-		let p_positions = Rc::clone(&r_positions);
-		let pos_vec: Vec<Position> = self.get_paddle_positions(p_positions);
-
-		info!("Moving autos");
+		let paddle_positions: Vec<Position> = self
+			.get_paddle_positions(Rc::clone(&rc_positions));
 
 		// Get the entities with trajectories
 		let mut trajectories = self
 			.borrow_component_vec_mut::<Trajectory>().unwrap();
 
-		let mut b_positions = Rc::clone(&r_positions).borrow_mut();
-		let autos = b_positions
+		let mut positions = Rc::clone(&rc_positions).borrow_mut();
+		let autos = positions
 			.iter_mut()
 			.zip(trajectories.iter_mut())
 			.filter_map(| (position, trajectory) |
@@ -286,157 +289,25 @@ impl Board {
 				// Hit the left paddle or score
 				PLAYER_1_ROW => {
 
-					// Detect collisions
-					for p in &pos_vec {
-
-						if p.pos_x != PLAYER_1_ROW {
-							continue;
-						}
-
-						let py = p.pos_y;
-
-						// Top paddle hit
-						if position.pos_y == py - 1 {
-
-							position.pos_x -= 1;
-							if position.pos_y > 2 {
-								position.pos_y -= 1;
-							}
-
-							trajectory.trj_x = 1;
-							trajectory.trj_y = -1;
-							debug!("POW!!! Top paddle hit: {},{} {},{}",
-								position.pos_x,
-								position.pos_y,
-								trajectory.trj_x,
-								trajectory.trj_y,
-							);
-
-						// Middle paddle hit
-						} else if position.pos_y == py {
-
-							position.pos_x += 1;
-
-							trajectory.trj_x = 1;
-							trajectory.trj_y = 0;
-							debug!("POW!!! Middle paddle hit: {},{} {},{}",
-								position.pos_x,
-								position.pos_y,
-								trajectory.trj_x,
-								trajectory.trj_y,
-							);
-
-						// Bottom paddle hit
-						} else if position.pos_y == py + 1 {
-
-							position.pos_x += 1;
-							if position.pos_y < SCREEN_Y-3 {
-								position.pos_y += 1;
-							}
-
-							trajectory.trj_x = 1;
-							trajectory.trj_y = 1;
-							debug!("POW!!! Bottom paddle hit: {},{} {},{}",
-								position.pos_x,
-								position.pos_y,
-								trajectory.trj_x,
-								trajectory.trj_y,
-							);
-
-						// Score!
-						} else {
-
-							position.pos_x = SCREEN_MID_X;
-							position.pos_y = SCREEN_MID_Y;
-							debug!("SCORE! {},{}",
-								position.pos_x,
-								position.pos_y,
-							);
-
-							return Some(player2);
-						}
-					}
-					trajectory.trj_x = 1;
-					info!("Auto x trajectory updated to 1");
-					return None;
+					return detect_paddle_collisions(position,
+						trajectory,
+						&paddle_positions,
+						PLAYER_1_ROW,
+						PLAYER_1_X_DIRECTION,
+						player2
+					);
 				}
 
 				// Hit the right paddle or score
 				PLAYER_2_ROW => {
 
-					// Detect collisions
-					for p in &pos_vec {
-
-						if p.pos_x != PLAYER_2_ROW {
-							continue;
-						}
-
-						let py = p.pos_y;
-
-						// Top paddle hit
-						if position.pos_y == py - 1 {
-
-							position.pos_x -= 1;
-							if position.pos_y > 2 {
-								position.pos_y -= 1;
-							}
-
-							trajectory.trj_x = -1;
-							trajectory.trj_y = -1;
-							debug!("POW!!! Top paddle hit: {},{} {},{}",
-								position.pos_x,
-								position.pos_y,
-								trajectory.trj_x,
-								trajectory.trj_y,
-							);
-
-						// Middle paddle hit
-						} else if position.pos_y == py {
-
-							position.pos_x -= 1;
-
-							trajectory.trj_x = -1;
-							trajectory.trj_y = 0;
-							debug!("POW!!! Middle paddle hit: {},{} {},{}",
-								position.pos_x,
-								position.pos_y,
-								trajectory.trj_x,
-								trajectory.trj_y,
-							);
-
-						// Bottom paddle hit
-						} else if position.pos_y == py + 1 {
-
-							position.pos_x -= 1;
-							if position.pos_y < SCREEN_Y-3 {
-								position.pos_y += 1;
-							}
-
-							trajectory.trj_x = -1;
-							trajectory.trj_y = 1;
-							debug!("POW!!! Bottom paddle hit: {},{} {},{}",
-								position.pos_x,
-								position.pos_y,
-								trajectory.trj_x,
-								trajectory.trj_y,
-							);
-
-						// Score!
-						} else {
-
-							position.pos_x = SCREEN_MID_X;
-							position.pos_y = SCREEN_MID_Y;
-							debug!("SCORE! {},{}",
-								position.pos_x,
-								position.pos_y,
-							);
-
-							return Some(player1);
-						}
-					}
-
-					info!("Auto x trajectory updated to -1");
-					return None;
+					return detect_paddle_collisions(position,
+						trajectory,
+						&paddle_positions,
+						PLAYER_2_ROW,
+						PLAYER_2_X_DIRECTION,
+						player1
+					);
 				}
 
 				// Update position
@@ -468,6 +339,105 @@ impl Board {
 			.unwrap()
 			.0 += 1;
 	}
+}
+
+fn detect_paddle_collisions(position: &mut Position,
+	trajectory: &mut Trajectory,
+	paddle_positions: &Vec<Position>,
+	player_row: usize,
+	direction: isize,
+	scoring_player: usize
+) -> Option<usize> {
+
+	// Detect collisions
+	for p in paddle_positions {
+
+		if p.pos_x != player_row {
+			continue;
+		}
+
+		let py = p.pos_y;
+
+		// Top paddle hit
+		if position.pos_y == py - 1 {
+
+			position.pos_x = match update_position(
+				position.pos_x,
+				direction
+			) {
+				Some(new_pos_x) => new_pos_x,
+				None => position.pos_x,
+			};
+			if position.pos_y > 2 {
+				position.pos_y -= 1;
+			}
+
+			trajectory.trj_x = direction;
+			trajectory.trj_y = -1;
+			debug!("POW!!! Top paddle hit: {},{} {},{}",
+				position.pos_x,
+				position.pos_y,
+				trajectory.trj_x,
+				trajectory.trj_y,
+			);
+
+		// Middle paddle hit
+		} else if position.pos_y == py {
+
+			position.pos_x = match update_position(
+				position.pos_x,
+				direction
+			) {
+				Some(new_pos_x) => new_pos_x,
+				None => position.pos_x,
+			};
+
+			trajectory.trj_x = direction;
+			trajectory.trj_y = 0;
+			debug!("POW!!! Middle paddle hit: {},{} {},{}",
+				position.pos_x,
+				position.pos_y,
+				trajectory.trj_x,
+				trajectory.trj_y,
+			);
+
+		// Bottom paddle hit
+		} else if position.pos_y == py + 1 {
+
+			position.pos_x = match update_position(
+				position.pos_x,
+				direction
+			) {
+				Some(new_pos_x) => new_pos_x,
+				None => position.pos_x,
+			};
+			if position.pos_y < SCREEN_Y-3 {
+				position.pos_y += 1;
+			}
+
+			trajectory.trj_x = direction;
+			trajectory.trj_y = 1;
+			debug!("POW!!! Bottom paddle hit: {},{} {},{}",
+				position.pos_x,
+				position.pos_y,
+				trajectory.trj_x,
+				trajectory.trj_y,
+			);
+
+		// Score!
+		} else {
+
+			position.pos_x = SCREEN_MID_X;
+			position.pos_y = SCREEN_MID_Y;
+			debug!("SCORE! {},{}",
+				position.pos_x,
+				position.pos_y,
+			);
+
+			return Some(scoring_player);
+		}
+	}
+	None
 }
 
 // Add an isize to a usize and return a wrapped usize
