@@ -17,7 +17,7 @@ fn main() {
 
 	// Initialize Terminal
 	info!("Initializing Terminal...");
-	let stdout = Term::stdout();
+	let terminal = Term::stdout();
 
 	// Initialize Board
 	info!("Initializing Board...");
@@ -56,9 +56,9 @@ fn main() {
 
 	loop {
 
-		screen::draw_screen(screen, &stdout);
+		screen::draw_screen(screen, &terminal);
 
-		input::get_user_input(&stdout, &mut board, player1, player2);
+		input::get_user_input(&terminal, &mut board, player1, player2);
 
 		screen::update_screen(&mut screen, &mut board);
 	}

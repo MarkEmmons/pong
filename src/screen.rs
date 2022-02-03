@@ -37,12 +37,12 @@ pub fn update_screen(screen: &mut Screen, board: &mut Board) {
 }
 
 // Clear screen and draw current array
-pub fn draw_screen(screen: Screen, stdout: &Term) {
+pub fn draw_screen(screen: Screen, terminal: &Term) {
 
-	let _result = stdout.clear_screen();
+	let _result = terminal.clear_screen();
 	for row in screen.iter() {
 
-		let _result = stdout.write_line(row
+		let _result = terminal.write_line(row
 			.iter()
 			.collect::<String>()
 			.as_str()

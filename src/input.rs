@@ -6,9 +6,9 @@ use crate::Board;
 const UP: isize = -1;
 const DOWN: isize = 1;
 
-pub fn get_user_input(stdout: &Term, board: &mut Board, player1: usize, player2: usize) {
+pub fn get_user_input(terminal: &Term, board: &mut Board, player1: usize, player2: usize) {
 
-	if let Ok(key) = stdout.read_key() {
+	if let Ok(key) = terminal.read_key() {
 
 		match key {
 
