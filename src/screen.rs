@@ -1,5 +1,6 @@
 use console::Term;
 
+use crate::chars::{PADDLE_EDGE, PADDLE_CENTER, BALL};
 use crate::components::{Position, Score, Trajectory};
 use crate::constants::{SCREEN_X, SCREEN_Y, SCREEN_MID_X};
 use crate::ecs::Board;
@@ -79,9 +80,9 @@ fn update_paddles(screen: &mut Screen, board: &Board) {
 	for(position, score) in iter {
 
 		// Draw Paddle
-		screen[position.pos_y - 1][position.pos_x] = '|';
-		screen[position.pos_y][position.pos_x] = '|';
-		screen[position.pos_y + 1][position.pos_x] = '|';
+		screen[position.pos_y - 1][position.pos_x] = PADDLE_EDGE;
+		screen[position.pos_y][position.pos_x] = PADDLE_CENTER;
+		screen[position.pos_y + 1][position.pos_x] = PADDLE_EDGE;
 
 		// Draw Score
 		let score_pos: usize = if position.pos_x < SCREEN_MID_X {
@@ -112,6 +113,6 @@ fn update_balls(screen: &mut Screen, board: &Board) {
 	for(position, _trajectory) in iter {
 
 		// Draw Ball
-		screen[position.pos_y][position.pos_x] = 'O';
+		screen[position.pos_y][position.pos_x] = BALL;
 	}
 }
