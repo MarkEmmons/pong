@@ -1,4 +1,5 @@
 mod ecs;
+mod chars;
 mod constants;
 mod components;
 mod input;
