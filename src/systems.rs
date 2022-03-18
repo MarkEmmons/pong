@@ -138,6 +138,7 @@ impl Board {
 				}
 			}
 
+			// Detect collision w/ ceiling or floor
 			if new_pos_y <= 0 {
 				trajectory.trj_y = 1;
 				info!("Auto y trajectory updated to 1");
@@ -199,6 +200,11 @@ fn detect_paddle_collisions(position: &mut Position,
 
 	// Detect collisions
 	for p in paddle_positions {
+
+		//if let Position { pos_x @ player_row, pos_y: pos_y } = p {
+		//	info!("Detect for this paddle: {}, {} - {}", pos_x, py, player_row);
+		//} else {
+		//}
 
 		if p.pos_x != player_row {
 			continue;

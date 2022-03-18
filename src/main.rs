@@ -7,8 +7,10 @@ mod screen;
 mod systems;
 mod logger;
 
+use pancurses::{Window};
+use pancurses::{initscr, cbreak, noecho};
+
 use log::info;
-use console::Term;
 
 use crate::constants::{SCREEN_X, SCREEN_MID_X, SCREEN_MID_Y};
 use crate::components::{Position, Trajectory, Score};
@@ -22,7 +24,14 @@ fn main() {
 
 	// Initialize Terminal
 	info!("Initializing Terminal...");
-	let terminal = Term::stdout();
+	//let terminal = Term::stdout();
+	let window: Window = initscr();
+
+	cbreak();
+	noecho();
+
+	window.keypad(true);
+	window.nodelay(true);
 
 	// Initialize Board
 	info!("Initializing Board...");
@@ -61,9 +70,9 @@ fn main() {
 
 	loop {
 
-		screen::draw_screen(screen, &terminal);
+		screen::draw_screen(screen, &window);
 
-		input::get_user_input(&terminal, &mut board, player1, player2);
+		input::get_user_input(&window, &mut board, player1, player2);
 
 		screen::update_screen(&mut screen, &mut board);
 	}
