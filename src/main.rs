@@ -7,10 +7,12 @@ mod screen;
 mod systems;
 mod logger;
 
-use pancurses::{Window};
-use pancurses::{initscr, cbreak, noecho};
-
+use std::thread;
+use std::time::Duration;
 use log::info;
+
+use pancurses::{Window};
+use pancurses::{initscr, endwin, cbreak, noecho};
 
 use crate::constants::{SCREEN_X, SCREEN_MID_X, SCREEN_MID_Y};
 use crate::components::{Position, Trajectory, Score};
@@ -24,7 +26,6 @@ fn main() {
 
 	// Initialize Terminal
 	info!("Initializing Terminal...");
-	//let terminal = Term::stdout();
 	let window: Window = initscr();
 
 	cbreak();
@@ -68,12 +69,28 @@ fn main() {
 	info!("Initializing Screen...");
 	let mut screen: Screen = screen::init_screen(&board);
 
-	loop {
+	let mut frame = 1;
+	let mut quit = false;
+	while !quit {
 
 		screen::draw_screen(screen, &window);
 
-		input::get_user_input(&window, &mut board, player1, player2);
+		quit = input::get_user_input(&window, &mut board, player1, player2);
+
+		if frame % 16 == 0 {
+
+			match board.move_autos(player1, player2) {
+				Some(player) => board.update_score(player),
+				_ => (),
+			}
+
+			frame = 1;
+		}
 
 		screen::update_screen(&mut screen, &mut board);
+
+		thread::sleep(Duration::from_millis(1));
+		frame += 1;
 	}
+	endwin();
 }

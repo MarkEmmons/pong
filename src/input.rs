@@ -1,13 +1,13 @@
 use log::info;
 
-use pancurses::Input;
+use pancurses::{Window, Input};
 
 use crate::constants::{UP, DOWN};
 use crate::Board;
 
-pub fn get_user_input(terminal: &Term, board: &mut Board, player1: usize, player2: usize) {
+pub fn get_user_input(window: &Window, board: &mut Board, player1: usize, player2: usize) -> bool {
 
-	if let Some(key) = terminal.getch() {
+	if let Some(key) = window.getch() {
 
 		match key {
 
@@ -24,7 +24,7 @@ pub fn get_user_input(terminal: &Term, board: &mut Board, player1: usize, player
 				match c {
 
 					// Quit when the user hits 'q'
-					'q' => todo!("quit"),
+					'q' => return true,
 
 					'w' => board.move_entity(player1, UP),
 
@@ -149,8 +149,5 @@ pub fn get_user_input(terminal: &Term, board: &mut Board, player1: usize, player
 		}
 	}
 
-	match board.move_autos(player1, player2) {
-		Some(player) => board.update_score(player),
-		_ => (),
-	}
+	false
 }

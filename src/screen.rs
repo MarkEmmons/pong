@@ -1,5 +1,5 @@
 use pancurses::{Window};
-use pancurses::{initscr, cbreak, noecho};
+//use pancurses::{initscr, cbreak, noecho};
 
 use crate::chars::{PADDLE_EDGE, PADDLE_CENTER, BALL};
 use crate::components::{Position, Score, Trajectory};
@@ -37,13 +37,17 @@ pub fn update_screen(screen: &mut Screen, board: &mut Board) {
 // Clear screen and draw current array
 pub fn draw_screen(screen: Screen, window: &Window) {
 
-	let _result = terminal.clear_screen();
-	for row in screen.iter() {
+	window.clear();
 
-		let _result = terminal.write_line(row
-			.iter()
-			.collect::<String>()
-			.as_str()
+	for (row, line) in screen.iter().enumerate() {
+
+		let _result = window.mvprintw(
+			row.try_into()
+				.unwrap(),
+			0,
+			line.iter()
+				.collect::<String>()
+				.as_str()
 		);
 	}
 }
