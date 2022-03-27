@@ -1,25 +1,26 @@
 use log::info;
-use console::{Key, Term};
+
+use pancurses::Input;
 
 use crate::constants::{UP, DOWN};
 use crate::Board;
 
 pub fn get_user_input(terminal: &Term, board: &mut Board, player1: usize, player2: usize) {
 
-	if let Ok(key) = terminal.read_key() {
+	if let Some(key) = terminal.getch() {
 
 		match key {
 
 			// Supported Keys - Up and Down
-			Key::ArrowUp => {
+			Input::KeyUp => {
 				board.move_entity(player2, UP);
 			}
-			Key::ArrowDown => {
+			Input::KeyDown => {
 				board.move_entity(player2, DOWN);
 			}
 
 			// Character Keys
-			Key::Char(c) => {
+			Input::Character(c) => {
 				match c {
 
 					// Quit when the user hits 'q'
@@ -35,21 +36,21 @@ pub fn get_user_input(terminal: &Term, board: &mut Board, player1: usize, player
 			}
 
 			// Special Keys not used
-			Key::ArrowLeft => info!("Caught unused key: Left"),
-			Key::ArrowRight => info!("Caught unused key: Right"),
-			Key::Enter => info!("Caught unused key: Enter"),
-			Key::Escape => info!("Caught unused key: Escape"),
-			Key::Backspace => info!("Caught unused key: Backspace"),
-			Key::Home => info!("Caught unused key: Home"),
-			Key::End => info!("Caught unused key: End"),
-			Key::Tab => info!("Caught unused key: Tab"),
-			Key::BackTab => info!("Caught unused key: BackTab"),
-			Key::Alt => info!("Caught unused key: Alt"),
-			Key::Del => info!("Caught unused key: Del"),
-			Key::Shift => info!("Caught unused key: Shift"),
-			Key::Insert => info!("Caught unused key: Insert"),
-			Key::PageUp => info!("Caught unused key: PageUp"),
-			Key::PageDown => info!("Caught unused key: PageDown"),
+			Input::KeyLeft => info!("Caught unused key: Left"),
+			Input::KeyRight => info!("Caught unused key: Right"),
+			Input::KeyEnter => info!("Caught unused key: Enter"),
+			Input::KeyBreak => info!("Caught unused key: Escape"),
+			Input::KeyBackspace => info!("Caught unused key: Backspace"),
+			Input::KeyHome => info!("Caught unused key: Home"),
+			Input::KeyEnd => info!("Caught unused key: End"),
+			Input::KeyTab => info!("Caught unused key: Tab"),
+			Input::KeyBackTab => info!("Caught unused key: BackTab"),
+			Input::KeyAlt => info!("Caught unused key: Alt"),
+			Input::KeyDel => info!("Caught unused key: Del"),
+			Input::KeyShift => info!("Caught unused key: Shift"),
+			Input::KeyInsert => info!("Caught unused key: Insert"),
+			Input::PageUp => info!("Caught unused key: PageUp"),
+			Input::PageDown => info!("Caught unused key: PageDown"),
 
 			_ => info!("Caught unused key: Couldn't match key"),
 		}
